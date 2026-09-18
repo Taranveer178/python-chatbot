@@ -66,7 +66,7 @@ def init_rag_pipeline(pdf_path: str = "portfolio.pdf"):
     retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash",
+        model="gemini-3.6-flash",
         temperature=0.2
     )
 
