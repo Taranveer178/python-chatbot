@@ -2,12 +2,15 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 
-# LangChain & FastEmbed imports
+# Document loading and splitting
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
+
+# Google GenAI Embeddings & LLM
+from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
+
+# Vector storage and chains
 from langchain_community.vectorstores import FAISS
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_classic.chains import create_retrieval_chain
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
@@ -21,7 +24,7 @@ st.set_page_config(
 
 load_dotenv()
 if not os.getenv("GOOGLE_API_KEY"):
-    st.error("Missing GOOGLE_API_KEY. Please verify your .env file.")
+    st.error("Missing GOOGLE_API_KEY. Please verify your environment variables or Streamlit Secrets.")
     st.stop()
 
 # Cache pipeline so PDF parsing and embedding only happen once
@@ -37,7 +40,8 @@ def init_rag_pipeline(pdf_path: str = "portfolio.pdf"):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
     chunks = text_splitter.split_documents(docs)
 
-    embeddings = FastEmbedEmbeddings(model_name="BAAI/bge-small-en-v1.5")
+    # Use Google's native embedding model (No local compilation required)
+    embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-3.5-preview")
     vectorstore = FAISS.from_documents(chunks, embeddings)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
@@ -71,7 +75,7 @@ st.caption("Ask questions about my experience, technical skills, and past projec
 # Sidebar controls
 with st.sidebar:
     st.header("About")
-    st.write("This bot uses **LangChain**, **FastEmbed**, **FAISS**, and **Google Gemini** to answer questions using my portfolio.")
+    st.write("This bot uses **LangChain**, **FAISS**, and **Google Gemini** to answer questions using my portfolio.")
     if st.button("Clear Conversation"):
         st.session_state.messages = []
         st.rerun()
@@ -89,17 +93,14 @@ for msg in st.session_state.messages:
 
 # Handle incoming user queries
 if prompt := st.chat_input("Ask a question about my work..."):
-    # Append and display user input
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Retrieve and generate assistant reply
     with st.chat_message("assistant"):
         with st.spinner("Searching portfolio..."):
             response = rag_chain.invoke({"input": prompt})
             answer = response["answer"]
             st.markdown(answer)
 
-    # Save assistant reply to session state
     st.session_state.messages.append({"role": "assistant", "content": answer})
