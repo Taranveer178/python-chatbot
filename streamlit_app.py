@@ -41,7 +41,7 @@ def init_rag_pipeline(pdf_path: str = "portfolio.pdf"):
     chunks = text_splitter.split_documents(docs)
 
     # Use Google's native embedding model (No local compilation required)
-    embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-3.5-preview")
+    embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-2-preview")
     vectorstore = FAISS.from_documents(chunks, embeddings)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
