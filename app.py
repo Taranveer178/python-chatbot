@@ -49,7 +49,7 @@ def create_rag_pipeline(pdf_path: str = "portfolio.pdf"):
     # 5. Gemini Chat Model for generating responses
     print("[4/4] Configuring Gemini LLM...")
     llm = ChatGoogleGenerativeAI(
-        model="gemini-3.6-flash",
+        model="gemini-3.5-flash-lite",
         temperature=0.2
     )
 
