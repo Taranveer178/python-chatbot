@@ -17,10 +17,30 @@ from langchain_core.prompts import ChatPromptTemplate
 
 # Page settings
 st.set_page_config(
-    page_title="Portfolio AI Assistant",
+    page_title="Taran's AI Assistant",
     page_icon="🤖",
     layout="centered"
 )
+# Add this right after st.set_page_config(...) in streamlit_app.py
+
+st.markdown("""
+    <style>
+    /* Change size of the main title  */
+    h1 {
+        font-size: 22px !important;
+    }
+    
+    /* Change size of the subtitle/caption */
+    .stCaption {
+        font-size: 13px !important;
+    }
+    
+    /* Change size of the chat messages text */
+    .stChatMessage p {
+        font-size: 14px !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 load_dotenv()
 if not os.getenv("GOOGLE_API_KEY"):
@@ -28,7 +48,7 @@ if not os.getenv("GOOGLE_API_KEY"):
     st.stop()
 
 # Cache pipeline so PDF parsing and embedding only happen once
-@st.cache_resource(show_spinner="Loading portfolio & preparing vector database...")
+@st.cache_resource(show_spinner="Loading Taran's Personal AI Assistant...")
 def init_rag_pipeline(pdf_path: str = "portfolio.pdf"):
     if not os.path.exists(pdf_path):
         st.error(f"'{pdf_path}' not found! Place your portfolio PDF in this folder.")
@@ -69,13 +89,13 @@ def init_rag_pipeline(pdf_path: str = "portfolio.pdf"):
 rag_chain = init_rag_pipeline()
 
 # Header section
-st.title("💼 Portfolio AI Assistant")
+st.title("💼 Taran's AI Assistant")
 st.caption("Ask questions about my experience, technical skills, and past projects.")
 
 # Sidebar controls
 with st.sidebar:
     st.header("About")
-    st.write("This bot uses **LangChain**, **FAISS**, and **Google Gemini** to answer questions using my portfolio.")
+    st.write("This bot is developed using **LangChain**, **FAISS**, and **Google Gemini's API** By Taran. For more details kindly contact me through my mail given on the https://taranveer.in")
     if st.button("Clear Conversation"):
         st.session_state.messages = []
         st.rerun()
@@ -98,7 +118,7 @@ if prompt := st.chat_input("Ask a question about my work..."):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        with st.spinner("Searching portfolio..."):
+        with st.spinner("Typing..."):
             response = rag_chain.invoke({"input": prompt})
             answer = response["answer"]
             st.markdown(answer)
