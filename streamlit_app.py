@@ -18,47 +18,46 @@ from langchain_core.prompts import ChatPromptTemplate
 # Page settings
 st.set_page_config(
     page_title="Taranveer Singh | AI Assistant",
-    page_icon="💼",
+    page_icon="🤖",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
-# Robust, Adaptive CSS (Light & Dark Theme Compatible)
+# 1. Custom CSS applied for the Header, Chat Bubbles, and Typing Animation
 st.markdown("""
     <style>
-    /* 1. Hide default Streamlit chrome, header, sidebar arrow, and footer */
-    #MainMenu, header, footer {
-        visibility: hidden !important;
-        height: 0 !important;
-    }
-    [data-testid="stHeader"] {
-        display: none !important;
-    }
-    [data-testid="stSidebarCollapseButton"], section[data-testid="stSidebar"] {
-        display: none !important;
-    }
+    /* Hide Streamlit default chrome */
+    #MainMenu, header, footer { visibility: hidden !important; height: 0 !important; }
+    [data-testid="stHeader"] { display: none !important; }
+    [data-testid="stSidebarCollapseButton"], section[data-testid="stSidebar"] { display: none !important; }
 
-    /* 2. Responsive layout container with zero iframe waste */
+    /* Clean padding for iframe embed */
     .block-container {
         padding-top: 0.8rem !important;
         padding-bottom: 4rem !important;
-        padding-left: 0.8rem !important;
-        padding-right: 0.8rem !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
         max-width: 100% !important;
     }
 
-    /* 3. Header styling */
-    .header-container {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
+    /* ----------------------------------------------------
+       HEADER: Force single row, #5166D8 background
+    ---------------------------------------------------- */
+    /* Target the st.columns container to prevent mobile stacking */
+    div[data-testid="stHorizontalBlock"] {
+        flex-wrap: nowrap !important; 
+        background-color: #5166D8 !important;
+        padding: 12px 16px !important;
+        border-radius: 12px !important;
+        align-items: center !important;
+        margin-bottom: 15px !important;
+        box-shadow: 0 4px 10px rgba(81, 102, 216, 0.25) !important;
     }
 
     .title-text {
         font-size: 1.15rem !important;
         font-weight: 700 !important;
-        color: var(--text-color) !important;
+        color: #ffffff !important;
         margin: 0 !important;
         line-height: 1.2 !important;
     }
@@ -68,87 +67,119 @@ st.markdown("""
         align-items: center;
         gap: 5px;
         font-size: 0.72rem;
-        color: #16a34a;
+        color: #e0e7ff !important;
         font-weight: 500;
-        margin-top: 2px;
+        margin-top: 3px;
     }
 
     .status-dot {
         width: 7px;
         height: 7px;
-        background-color: #16a34a;
+        background-color: #4ade80; /* bright online green */
         border-radius: 50%;
         display: inline-block;
     }
 
-    /* 4. Top-Right Info Button styling */
+    /* Info button styling (Top Right) */
+    div[data-testid="stColumn"]:last-child {
+        display: flex !important;
+        justify-content: flex-end !important;
+        min-width: 40px !important;
+    }
+
     div[data-testid="stColumn"]:last-child button {
         border-radius: 50% !important;
-        width: 32px !important;
-        height: 32px !important;
+        width: 34px !important;
+        height: 34px !important;
         padding: 0 !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        border: 1px solid rgba(128, 128, 128, 0.25) !important;
-        background-color: var(--secondary-background-color) !important;
-        color: #2563eb !important;
-        float: right !important;
-        transition: transform 0.15s ease, border-color 0.15s ease;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+        transition: all 0.2s ease !important;
     }
 
     div[data-testid="stColumn"]:last-child button:hover {
-        transform: scale(1.08);
-        border-color: #2563eb !important;
+        background-color: rgba(255, 255, 255, 0.25) !important;
+        transform: scale(1.05);
     }
 
-    /* 5. Chat message bubbles & typography */
+    /* ----------------------------------------------------
+       CHAT BUBBLES: Fix text bleed and height constraints
+    ---------------------------------------------------- */
     [data-testid="stChatMessage"] {
         background-color: var(--secondary-background-color) !important;
         border: 1px solid rgba(128, 128, 128, 0.15) !important;
         border-radius: 14px !important;
-        padding: 10px 14px !important;
-        margin-bottom: 8px !important;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+        padding: 12px 14px !important;
+        margin-bottom: 12px !important;
+        height: auto !important;             /* Fixes the bounding box text spill */
+        min-height: min-content !important; 
+        display: flex !important;
+        align-items: flex-start !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    }
+
+    [data-testid="stChatMessage"] > div {
+        overflow: visible !important;
     }
 
     [data-testid="stChatMessage"] p {
-        font-size: 0.88rem !important;
-        line-height: 1.45 !important;
+        font-size: 0.9rem !important;
+        line-height: 1.5 !important;
         color: var(--text-color) !important;
-        margin-bottom: 0 !important;
+        margin: 0 !important;
+        word-wrap: break-word !important;
+        white-space: pre-wrap !important;
     }
 
-    /* 6. Clean Chat Input field */
-    [data-testid="stChatInput"] {
-        border-radius: 20px !important;
+    /* ----------------------------------------------------
+       TYPING ANIMATION (3 Dots)
+    ---------------------------------------------------- */
+    .typing-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 8px;
+    }
+    .typing-indicator span {
+        width: 6px;
+        height: 6px;
+        background-color: #5166D8;
+        border-radius: 50%;
+        animation: typingBounce 1.4s infinite ease-in-out both;
+    }
+    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+    
+    @keyframes typingBounce {
+        0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+        40% { transform: scale(1); opacity: 1; }
     }
     </style>
 """, unsafe_allow_html=True)
 
 load_dotenv()
 if not os.getenv("GOOGLE_API_KEY"):
-    st.error("Missing GOOGLE_API_KEY. Please set it in Streamlit Secrets or your local .env file.")
+    st.error("Missing GOOGLE_API_KEY. Please verify your environment variables.")
     st.stop()
 
-# Cache pipeline so PDF parsing and embedding happen only once
 @st.cache_resource(show_spinner="Connecting to Taran's Knowledge Base...")
 def init_rag_pipeline(pdf_path: str = "portfolio.pdf"):
     if not os.path.exists(pdf_path):
-        st.error(f"'{pdf_path}' not found! Please ensure portfolio.pdf is in the project root.")
+        st.error(f"'{pdf_path}' not found! Place portfolio.pdf in this folder.")
         st.stop()
 
     loader = PyPDFLoader(pdf_path)
     docs = loader.load()
 
-    # Smaller chunk size minimizes token load per request
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     chunks = text_splitter.split_documents(docs)
 
     embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-2-preview")
     vectorstore = FAISS.from_documents(chunks, embeddings)
-    
-    # Retrieve top 2 most relevant chunks to preserve token quota
     retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
 
     llm = ChatGoogleGenerativeAI(
@@ -158,12 +189,10 @@ def init_rag_pipeline(pdf_path: str = "portfolio.pdf"):
     )
 
     system_prompt = (
-        "You are the official portfolio AI assistant representing Taranveer Singh, "
-        "a Full-Stack PHP Developer specializing in PHP, Laravel, React JS, and MySQL. "
-        "Answer questions from recruiters and visitors strictly using the retrieved context. "
-        "Keep answers short, direct, and concise (1 to 2 sentences maximum). "
-        "If an answer is not in the context, state that briefly and recommend contacting Taran directly "
-        "via email at staranveer178@gmail.com or via https://taranveer.in.\n\n"
+        "You are the official portfolio AI assistant representing Taranveer Singh. "
+        "Answer questions strictly using the retrieved context below. "
+        "Keep answers short and concise (1 to 2 sentences maximum). "
+        "If an answer is not in the context, state that briefly and suggest contacting Taran via taranveer.in.\n\n"
         "Context:\n{context}"
     )
 
@@ -177,27 +206,24 @@ def init_rag_pipeline(pdf_path: str = "portfolio.pdf"):
 
 rag_chain = init_rag_pipeline()
 
-# Right-hand "ℹ️" Modal Dialog
 @st.dialog("About Taran's Assistant")
 def show_about_dialog():
     st.markdown("""
     **Taranveer Singh — Portfolio Assistant**
     
-    Full-Stack PHP Developer building reliable, business-focused web applications with **Laravel, React JS, MySQL, and Modern AI**.
-    
+    Full-Stack PHP Developer building reliable web applications with Laravel, React JS, and Modern AI.
     * **Portfolio:** [taranveer.in](https://taranveer.in)
-    * **Email:** [staranveer178@gmail.com](mailto:staranveer178@gmail.com)
-    * **Stack:** LangChain • FAISS • Gemini API
+    * **Email:** staranveer178@gmail.com
     """)
     st.divider()
     if st.button("🧹 Clear Chat History", use_container_width=True):
         st.session_state.messages = [
-            {"role": "assistant", "content": "Chat reset! Feel free to ask about Taran's projects, tech stack, or experience."}
+            {"role": "assistant", "content": "Chat reset! Feel free to ask about Taran's projects or experience."}
         ]
         st.rerun()
 
-# Header: Left side Title/Status, Right side Info Button
-col_header, col_info = st.columns([0.86, 0.14])
+# 2. Header UI
+col_header, col_info = st.columns([0.85, 0.15])
 
 with col_header:
     st.markdown("""
@@ -206,35 +232,48 @@ with col_header:
     """, unsafe_allow_html=True)
 
 with col_info:
-    if st.button("ℹ️", key="info_btn", help="About Taran & Options"):
+    if st.button("ℹ️", key="info_btn", help="About Taran"):
         show_about_dialog()
 
-st.write("")  # Lightweight spacer
-
-# Initialize chat history
+# Initialize history
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {
-            "role": "assistant",
+            "role": "assistant", 
             "content": "Hi! I'm Taran's portfolio assistant. Ask me anything about his technical stack, past projects, or background."
         }
     ]
 
-# Render conversation history
+# 3. Render previous chat history with Custom Avatars (🤖 and 👤)
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
+    avatar_icon = "🤖" if msg["role"] == "assistant" else "👤"
+    with st.chat_message(msg["role"], avatar=avatar_icon):
         st.markdown(msg["content"])
 
-# User query handling
+# Handle user input
 if prompt := st.chat_input("Ask about skills, projects, or experience..."):
+    # Append user message
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar="👤"):
         st.markdown(prompt)
 
-    with st.chat_message("assistant"):
-        with st.spinner("Answering..."):
-            response = rag_chain.invoke({"input": prompt})
-            answer = response["answer"]
-            st.markdown(answer)
+    # 4. Generate Assistant Response with Typing Animation
+    with st.chat_message("assistant", avatar="🤖"):
+        # Create an empty placeholder to hold the typing animation
+        message_placeholder = st.empty()
+        
+        # Inject HTML for the animated 3-dot pill
+        message_placeholder.markdown("""
+            <div class="typing-indicator">
+              <span></span><span></span><span></span>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Fetch the response
+        response = rag_chain.invoke({"input": prompt})
+        answer = response["answer"]
+        
+        # Replace the typing animation with the actual text response
+        message_placeholder.markdown(answer)
 
     st.session_state.messages.append({"role": "assistant", "content": answer})
