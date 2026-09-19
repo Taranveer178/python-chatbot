@@ -2,7 +2,7 @@
 
 An interactive, Retrieval-Augmented Generation (RAG) chatbot designed to answer visitor and recruiter questions about Taranveer Singh's technical stack, work experience, and projects.
 
-Built with **Streamlit**, **LangChain**, **FAISS**, and **Google Gemini**, optimized for low-latency responses and embedded directly onto [taranveer.in](https://taranveer.in?utm_source=gemini).
+Built with **Streamlit**, **LangChain**, **FAISS**, and **Google Gemini**, optimized for low-latency responses and embedded directly onto [taranveer.in](https://taranveer.in?).
 
 ---
 
@@ -18,11 +18,11 @@ Built with **Streamlit**, **LangChain**, **FAISS**, and **Google Gemini**, optim
 
 ## 🛠️ Tech Stack
 
-* **Frontend & App Framework:** [Streamlit](https://streamlit.io/?utm_source=gemini)
-* **LLM Orchestration:** [LangChain](https://www.langchain.com/?utm_source=gemini)
+* **Frontend & App Framework:** [Streamlit](https://streamlit.io/)
+* **LLM Orchestration:** [LangChain](https://www.langchain.com/)
 * **Embeddings:** Google Generative AI (`gemini-embedding-2-preview`)
 * **LLM Engine:** Google Gemini Flash (`gemini-3.5-flash-lite`)
-* **Vector Index:** [FAISS CPU](https://github.com/facebookresearch/faiss?utm_source=gemini)
+* **Vector Index:** [FAISS CPU](https://github.com/facebookresearch/faiss)
 * **PDF Processing:** PyPDF
 
 ---
@@ -46,7 +46,7 @@ Built with **Streamlit**, **LangChain**, **FAISS**, and **Google Gemini**, optim
 ### Prerequisites
 
 * Python 3.10+
-* A Google AI Studio API key ([Get one here](https://aistudio.google.com/?utm_source=gemini))
+* A Google AI Studio API key ([Get one here](https://aistudio.google.com/))
 
 ### 1. Clone the Repository
 
@@ -106,7 +106,7 @@ The app will launch at `http://localhost:8501`.
 ## ☁️ Deployment (Streamlit Cloud)
 
 1. Push this repository to GitHub.
-2. Log into [Streamlit Community Cloud](https://share.streamlit.io/?utm_source=gemini).
+2. Log into [Streamlit Community Cloud](https://share.streamlit.io/).
 3. Select **New App**, pick your repository, and set the **Main file path** to `streamlit_app.py`.
 4. Go to **Advanced settings → Secrets** and configure your API key:
 ```toml
@@ -137,4 +137,4 @@ To embed the deployed chatbot into an iframe or floating widget on `taranveer.in
 
 ## 📄 License
 
-This project is open-source and available under the [MIT License](https://www.google.com/search?q=LICENSE&utm_source=gemini).
+This project is open-source and available under the [MIT License](https://www.google.com/search?q=LICENSE&).
