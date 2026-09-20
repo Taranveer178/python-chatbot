@@ -18,27 +18,74 @@ from langchain_core.prompts import ChatPromptTemplate
 # Page settings
 st.set_page_config(
     page_title="Taran's AI Assistant",
-        page_icon="🤖",
+    page_icon="🤖",
     layout="centered"
 )
-# Add this right after st.set_page_config(...) in streamlit_app.py
 
-st.markdown("""
+# Avatar URL for the Assistant
+AVATAR_URL = "https://taranveer.in/img/Taranveer_logo_light.webp"
+
+# Custom CSS for Professional Chatbot UI (Drift/Intercom style)
+st.markdown(f"""
     <style>
-    /* Change size of the main title  */
-    h1 {
-        font-size: 22px !important;
-    }
+    /* Reduce top padding */
+    .block-container {{
+        padding-top: 2rem !important;
+        max-width: 700px;
+    }}
     
-    /* Change size of the subtitle/caption */
-    .stCaption {
-        font-size: 13px !important;
-    }
+    /* Remove default background from chat messages */
+    [data-testid="stChatMessage"] {{
+        background-color: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        margin-bottom: 20px !important;
+    }}
+
+    /* Bot Message Bubble (Left) */
+    /* Targets the bot message since we inject an img tag for its avatar */
+    [data-testid="stChatMessage"]:has(img) div[data-testid="stMarkdownContainer"] {{
+        background-color: #F3F4F6;
+        color: #1F2937;
+        padding: 12px 18px;
+        border-radius: 0px 18px 18px 18px;
+        display: inline-block;
+        max-width: 85%;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }}
+
+    /* User Message Bubble (Right) */
+    /* Targets the user message which uses the default SVG avatar */
+    [data-testid="stChatMessage"]:has(svg) {{
+        flex-direction: row-reverse;
+    }}
     
-    /* Change size of the chat messages text */
-    .stChatMessage p {
-        font-size: 14px !important;
-    }
+    [data-testid="stChatMessage"]:has(svg) div[data-testid="stMarkdownContainer"] {{
+        background-color: #2563EB;
+        color: white;
+        padding: 12px 18px;
+        border-radius: 18px 18px 0px 18px;
+        display: inline-block;
+        max-width: 85%;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }}
+    
+    /* Ensure user text is white */
+    [data-testid="stChatMessage"]:has(svg) div[data-testid="stMarkdownContainer"] p {{
+        color: white !important;
+    }}
+
+    /* Hide the default user avatar to match professional UI style */
+    [data-testid="stChatMessage"]:has(svg) div[data-testid="chatAvatarIcon-user"] {{
+        display: none;
+    }}
+    
+    /* General Chat Text Formatting */
+    .stChatMessage p {{
+        font-size: 15px !important;
+        margin-bottom: 0 !important;
+        line-height: 1.5;
+    }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -88,15 +135,25 @@ def init_rag_pipeline(pdf_path: str = "portfolio.pdf"):
 
 rag_chain = init_rag_pipeline()
 
-# Header section
-st.title("💼 Taran's AI Assistant")
-st.caption("Ask questions about my experience, technical skills, and past projects.")
+# Custom Professional Header (Replaces st.title to match the reference image)
+st.markdown(f"""
+    <div style="background-color: #2563EB; padding: 15px 20px; border-radius: 12px 12px 0 0; display: flex; align-items: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 30px;">
+        <img src="{AVATAR_URL}" style="width: 45px; height: 45px; border-radius: 50%; margin-right: 15px; background-color: white; object-fit: contain; padding: 2px;">
+        <div>
+            <h2 style="margin: 0; color: white; font-size: 18px; font-weight: 600; padding-bottom: 2px;">Taran's AI Assistant</h2>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%;"></div>
+                <p style="margin: 0; font-size: 13px; color: #e2e8f0;">Online Now</p>
+            </div>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
 
 # Sidebar controls
 with st.sidebar:
     st.header("About")
-    st.write("This bot is developed using **LangChain**, **FAISS**, and **Google Gemini's API** By Taran. For more details kindly contact me through my mail given on the https://taranveer.in")
-    if st.button("Clear Conversation"):
+    st.write("This bot is developed using **LangChain**, **FAISS**, and **Google Gemini's API** By Taran. For more details kindly contact me through my mail given on https://taranveer.in")
+    if st.button("Clear Conversation", type="primary"):
         st.session_state.messages = []
         st.rerun()
 
@@ -108,16 +165,21 @@ if "messages" not in st.session_state:
 
 # Render previous chat history
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
+    # Use custom avatar for assistant, default for user
+    avatar = AVATAR_URL if msg["role"] == "assistant" else None
+    with st.chat_message(msg["role"], avatar=avatar):
         st.markdown(msg["content"])
 
 # Handle incoming user queries
 if prompt := st.chat_input("Ask a question about my work..."):
+    
+    # Render user message
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    with st.chat_message("assistant"):
+    # Render assistant message
+    with st.chat_message("assistant", avatar=AVATAR_URL):
         with st.spinner("Typing..."):
             response = rag_chain.invoke({"input": prompt})
             answer = response["answer"]
