@@ -15,76 +15,76 @@ from langchain_classic.chains import create_retrieval_chain
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 
-# Page settings
+# Page settings - Sidebar disabled entirely for embed mode
 st.set_page_config(
     page_title="Taran's AI Assistant",
-    page_icon="🤖",
-    layout="centered"
+    layout="centered",
+    initial_sidebar_state="collapsed"
 )
 
-# Avatar URL for the Assistant
 AVATAR_URL = "https://taranveer.in/img/Taranveer_logo_light.webp"
 
-# Custom CSS for Professional Chatbot UI (Drift/Intercom style)
+# Custom CSS for a flush, embed-ready chat interface
 st.markdown(f"""
     <style>
-    /* Reduce top padding */
-    .block-container {{
-        padding-top: 2rem !important;
-        max-width: 700px;
-    }}
+    /* Hide all default Streamlit top-level elements */
+    header[data-testid="stHeader"] {{ display: none !important; }}
+    [data-testid="collapsedControl"] {{ display: none !important; }}
+    footer {{ display: none !important; }}
     
-    /* Remove default background from chat messages */
+    /* Remove main padding to fit flush inside your website's iframe */
+    .block-container {{
+        padding: 15px 15px 100px 15px !important; 
+        max-width: 100% !important;
+    }}
+
+    /* Base Chat Layout */
     [data-testid="stChatMessage"] {{
         background-color: transparent !important;
         border: none !important;
         padding: 0 !important;
-        margin-bottom: 20px !important;
+        margin-bottom: 16px !important;
     }}
 
     /* Bot Message Bubble (Left) */
-    /* Targets the bot message since we inject an img tag for its avatar */
     [data-testid="stChatMessage"]:has(img) div[data-testid="stMarkdownContainer"] {{
-        background-color: #F3F4F6;
+        background-color: #F9FAFB;
         color: #1F2937;
-        padding: 12px 18px;
-        border-radius: 0px 18px 18px 18px;
+        padding: 12px 16px;
+        border-radius: 0px 16px 16px 16px;
+        display: inline-block;
+        max-width: 85%;
+        border: 1px solid #E5E7EB;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }}
+
+    /* User Message Bubble (Right) */
+    [data-testid="stChatMessage"]:has(svg) {{
+        flex-direction: row-reverse;
+    }}
+    [data-testid="stChatMessage"]:has(svg) div[data-testid="stMarkdownContainer"] {{
+        background-color: #2563EB;
+        color: white;
+        padding: 12px 16px;
+        border-radius: 16px 16px 0px 16px;
         display: inline-block;
         max-width: 85%;
         box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }}
-
-    /* User Message Bubble (Right) */
-    /* Targets the user message which uses the default SVG avatar */
-    [data-testid="stChatMessage"]:has(svg) {{
-        flex-direction: row-reverse;
-    }}
-    
-    [data-testid="stChatMessage"]:has(svg) div[data-testid="stMarkdownContainer"] {{
-        background-color: #2563EB;
-        color: white;
-        padding: 12px 18px;
-        border-radius: 18px 18px 0px 18px;
-        display: inline-block;
-        max-width: 85%;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }}
-    
-    /* Ensure user text is white */
     [data-testid="stChatMessage"]:has(svg) div[data-testid="stMarkdownContainer"] p {{
         color: white !important;
     }}
 
-    /* Hide the default user avatar to match professional UI style */
+    /* Hide the default user avatar */
     [data-testid="stChatMessage"]:has(svg) div[data-testid="chatAvatarIcon-user"] {{
         display: none;
     }}
     
-    /* General Chat Text Formatting */
+    /* Chat Text Sizing */
     .stChatMessage p {{
-        font-size: 15px !important;
+        font-size: 14.5px !important;
         margin-bottom: 0 !important;
-        line-height: 1.5;
+        line-height: 1.45;
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -94,7 +94,6 @@ if not os.getenv("GOOGLE_API_KEY"):
     st.error("Missing GOOGLE_API_KEY. Please verify your environment variables or Streamlit Secrets.")
     st.stop()
 
-# Cache pipeline so PDF parsing and embedding only happen once
 @st.cache_resource(show_spinner="Loading Taran's Personal AI Assistant...")
 def init_rag_pipeline(pdf_path: str = "portfolio.pdf"):
     if not os.path.exists(pdf_path):
@@ -107,7 +106,6 @@ def init_rag_pipeline(pdf_path: str = "portfolio.pdf"):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
     chunks = text_splitter.split_documents(docs)
 
-    # Use Google's native embedding model (No local compilation required)
     embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-2-preview")
     vectorstore = FAISS.from_documents(chunks, embeddings)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
@@ -135,50 +133,22 @@ def init_rag_pipeline(pdf_path: str = "portfolio.pdf"):
 
 rag_chain = init_rag_pipeline()
 
-# Custom Professional Header (Replaces st.title to match the reference image)
-st.markdown(f"""
-    <div style="background-color: #2563EB; padding: 15px 20px; border-radius: 12px 12px 0 0; display: flex; align-items: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 30px;">
-        <img src="{AVATAR_URL}" style="width: 45px; height: 45px; border-radius: 50%; margin-right: 15px; background-color: white; object-fit: contain; padding: 2px;">
-        <div>
-            <h2 style="margin: 0; color: white; font-size: 18px; font-weight: 600; padding-bottom: 2px;">Taran's AI Assistant</h2>
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <div style="width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%;"></div>
-                <p style="margin: 0; font-size: 13px; color: #e2e8f0;">Online Now</p>
-            </div>
-        </div>
-    </div>
-""", unsafe_allow_html=True)
-
-# Sidebar controls
-with st.sidebar:
-    st.header("About")
-    st.write("This bot is developed using **LangChain**, **FAISS**, and **Google Gemini's API** By Taran. For more details kindly contact me through my mail given on https://taranveer.in")
-    if st.button("Clear Conversation", type="primary"):
-        st.session_state.messages = []
-        st.rerun()
-
-# Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {"role": "assistant", "content": "Hello! Ask me anything about my projects, background, or skills."}
     ]
 
-# Render previous chat history
 for msg in st.session_state.messages:
-    # Use custom avatar for assistant, default for user
     avatar = AVATAR_URL if msg["role"] == "assistant" else None
     with st.chat_message(msg["role"], avatar=avatar):
         st.markdown(msg["content"])
 
-# Handle incoming user queries
 if prompt := st.chat_input("Ask a question about my work..."):
     
-    # Render user message
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Render assistant message
     with st.chat_message("assistant", avatar=AVATAR_URL):
         with st.spinner("Typing..."):
             response = rag_chain.invoke({"input": prompt})
