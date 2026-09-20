@@ -22,13 +22,13 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Updated to the new white transparent WebP image
+# White transparent WebP image
 AVATAR_URL = "https://taranveer.in/img/chatbot.webp"
 
 # Custom CSS for a flush, embed-ready chat interface
 st.markdown(f"""
     <style>
-    /* 1. Hide all default Streamlit branding, headers, toolbars, and footers */
+    /* 1. Hide default Streamlit elements */
     header[data-testid="stHeader"], 
     [data-testid="collapsedControl"], 
     footer, 
@@ -40,13 +40,13 @@ st.markdown(f"""
         visibility: hidden !important;
     }}
 
-    /* 2. Remove default app background and any native borders */
+    /* 2. Remove default app background and borders */
     .stApp {{
         background: transparent !important;
         border: none !important;
     }}
     
-    /* 3. Remove main padding to fit flush inside your website's iframe */
+    /* 3. Outer padding */
     .block-container {{
         padding: 15px 15px 100px 15px !important; 
         max-width: 100% !important;
@@ -60,7 +60,7 @@ st.markdown(f"""
         margin-bottom: 16px !important;
     }}
 
-    /* Bot Avatar Styling - Adds blue background and circle shape to the transparent white image */
+    /* Bot Avatar Styling */
     [data-testid="stChatMessage"] img {{
         background-color: #2563EB !important;
         border-radius: 50% !important;
@@ -107,6 +107,20 @@ st.markdown(f"""
         font-size: 14.5px !important;
         margin-bottom: 0 !important;
         line-height: 1.45;
+    }}
+
+    /* 4. Fix for typing spinner splitting into multiple lines */
+    [data-testid="stChatMessage"] div[data-testid="stSpinner"] {{
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        white-space: nowrap !important;
+        width: fit-content !important;
+        min-width: 120px !important;
+    }}
+    [data-testid="stChatMessage"] div[data-testid="stSpinner"] > div {{
+        white-space: nowrap !important;
+        overflow: visible !important;
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -166,7 +180,6 @@ for msg in st.session_state.messages:
         st.markdown(msg["content"])
 
 if prompt := st.chat_input("Ask a question about my work..."):
-    
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
