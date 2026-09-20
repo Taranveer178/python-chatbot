@@ -22,17 +22,31 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# Updated to the new white transparent WebP image
 AVATAR_URL = "https://taranveer.in/img/chatbot.webp"
 
 # Custom CSS for a flush, embed-ready chat interface
 st.markdown(f"""
     <style>
-    /* Hide all default Streamlit top-level elements */
-    header[data-testid="stHeader"] {{ display: none !important; }}
-    [data-testid="collapsedControl"] {{ display: none !important; }}
-    footer {{ display: none !important; }}
+    /* 1. Hide all default Streamlit branding, headers, toolbars, and footers */
+    header[data-testid="stHeader"], 
+    [data-testid="collapsedControl"], 
+    footer, 
+    .viewerBadge_container, 
+    .stDeployButton, 
+    [data-testid="stToolbar"], 
+    [data-testid="stDecoration"] {{
+        display: none !important; 
+        visibility: hidden !important;
+    }}
+
+    /* 2. Remove default app background and any native borders */
+    .stApp {{
+        background: transparent !important;
+        border: none !important;
+    }}
     
-    /* Remove main padding to fit flush inside your website's iframe */
+    /* 3. Remove main padding to fit flush inside your website's iframe */
     .block-container {{
         padding: 15px 15px 100px 15px !important; 
         max-width: 100% !important;
@@ -44,6 +58,14 @@ st.markdown(f"""
         border: none !important;
         padding: 0 !important;
         margin-bottom: 16px !important;
+    }}
+
+    /* Bot Avatar Styling - Adds blue background and circle shape to the transparent white image */
+    [data-testid="stChatMessage"] img {{
+        background-color: #2563EB !important;
+        border-radius: 50% !important;
+        padding: 6px !important; 
+        object-fit: contain !important;
     }}
 
     /* Bot Message Bubble (Left) */
