@@ -92,6 +92,7 @@ st.markdown(f"""
     /* User Avatar */
     [data-testid="stChatMessage"]:has(img[src*="user.webp"]) img,
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) div {{
+        margin-top: 10px !important;
         background-color: transparent !important;
         border-radius: 50% !important;
         padding: 0px !important;
@@ -100,7 +101,7 @@ st.markdown(f"""
         height: 38px !important;
     }}
 
-    /* 6. Message Alignment - The structural fix */
+    /* 6. Message Alignment - Structural fix */
     [data-testid="stChatMessage"]:has(img[src*="user.webp"]) {{
         flex-direction: row-reverse !important;
     }}
@@ -124,21 +125,20 @@ st.markdown(f"""
         box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
         width: fit-content !important;
         max-width: 85% !important;
-        align-self: flex-start !important; /* Snaps to left */
+        align-self: flex-start !important;
     }}
 
     /* User Bubble */
     [data-testid="stChatMessage"]:has(img[src*="user.webp"]) div[data-testid="stMarkdownContainer"] {{
-        margin-top: 10px !important;
         background-color: #2563EB !important;
         color: white !important;
         padding: 12px 16px !important; 
         border-radius: 16px 16px 0px 16px !important;
         box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
-        width: fit-content !important; /* Shrinks wrapping box to text size */
+        width: fit-content !important;
         max-width: 85% !important;
-        align-self: flex-end !important; /* Snaps perfectly to the right */
-        margin-left: auto !important;    /* Fallback push to the right */
+        align-self: flex-end !important;
+        margin-left: auto !important;
     }}
 
     /* Zero out internal text margins to maintain exact padding balance */
@@ -165,6 +165,31 @@ st.markdown(f"""
     [data-testid="stChatMessage"] div[data-testid="stSpinner"] > div {{
         white-space: nowrap !important;
         overflow: visible !important;
+    }}
+
+    /* 9. Chat Input Submit Button Styling */
+    [data-testid="stChatInputSubmitButton"] button {{
+        background-color: transparent !important;
+        border: none !important;
+        color: #9CA3AF !important;
+        transition: all 0.2s ease !important;
+    }}
+    [data-testid="stChatInputSubmitButton"] button:enabled {{
+        background-color: #2563EB !important;
+        color: white !important;
+        border-radius: 8px !important;
+    }}
+
+    /* Hover state when enabled */
+    [data-testid="stChatInputSubmitButton"] button:enabled:hover {{
+        background-color: #1D4ED8 !important;
+        color: white !important;
+    }}
+
+    /* Arrow icon color match */
+    [data-testid="stChatInputSubmitButton"] button:enabled svg {{
+        fill: white !important;
+        stroke: white !important;
     }}
     </style>
 """, unsafe_allow_html=True)
