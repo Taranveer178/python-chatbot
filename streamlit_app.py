@@ -22,7 +22,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-AVATAR_URL = "https://taranveer.in/img/Taranveer_logo_light.webp"
+AVATAR_URL = "https://taranveer.in/img/chatbot.webp"
 
 # Custom CSS for a flush, embed-ready chat interface
 st.markdown(f"""
