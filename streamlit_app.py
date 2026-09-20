@@ -129,6 +129,7 @@ st.markdown(f"""
 
     /* User Bubble */
     [data-testid="stChatMessage"]:has(img[src*="user.webp"]) div[data-testid="stMarkdownContainer"] {{
+        margin-top: 10px !important;
         background-color: #2563EB !important;
         color: white !important;
         padding: 12px 16px !important; 
